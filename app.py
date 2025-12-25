@@ -31,6 +31,15 @@ if os.path.exists(FILE):
     df = pd.read_csv(FILE)
     st.dataframe(df)
 
+    # Download button
+    csv_data = df.to_csv(index=False).encode("utf-8")
+    st.download_button(
+        label="Download All Expenses (CSV)",
+        data=csv_data,
+        file_name="expenses.csv",
+        mime="text/csv"
+    )
+
     # Summary totals
     st.subheader("Summary: Total Paid by Each Person")
     totals = df.groupby("Paid By")["Amount"].sum()
