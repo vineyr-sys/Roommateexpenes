@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 import os
 
-FILE = "expenses.xlsx"
+FILE = "expenses.csv"
 
 st.title("Roommate Expense Tracker")
 
@@ -17,34 +17,29 @@ if st.button("Add Expense"):
     new_row = {"Date": today, "Item": item, "Amount": amount, "Paid By": paid_by}
 
     if os.path.exists(FILE):
-        df = pd.read_excel(FILE)
+        df = pd.read_csv(FILE)
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
         df = pd.DataFrame([new_row])
 
-    df.to_excel(FILE, index=False)
+    df.to_csv(FILE, index=False)
     st.success("Expense added!")
 
 # Show table
 if os.path.exists(FILE):
     st.subheader("All Expenses")
-    df = pd.read_excel(FILE)
+    df = pd.read_csv(FILE)
     st.dataframe(df)
 
-    # -----------------------------
-    # SUMMARY: Who paid how much
-    # -----------------------------
+    # Summary totals
     st.subheader("Summary: Total Paid by Each Person")
     totals = df.groupby("Paid By")["Amount"].sum()
     st.write(totals)
 
-    # -----------------------------
-    # WHO OWES HOW MUCH
-    # -----------------------------
+    # Who owes how much
     st.subheader("Who Owes How Much")
-
     total_spent = df["Amount"].sum()
-    split_amount = total_spent / 2  # equal split
+    split_amount = total_spent / 2
 
     viney_paid = totals.get("Viney", 0)
     anmol_paid = totals.get("Anmol", 0)
@@ -59,13 +54,9 @@ if os.path.exists(FILE):
     else:
         st.write("Both are settled.")
 
-    # -----------------------------
-    # MONTHLY TOTALS
-    # -----------------------------
+    # Monthly totals
     st.subheader("Monthly Totals")
-
     df["Date"] = pd.to_datetime(df["Date"])
     df["Month"] = df["Date"].dt.to_period("M").astype(str)
-
     monthly_totals = df.groupby("Month")["Amount"].sum()
     st.write(monthly_totals)
