@@ -7,9 +7,12 @@ FILE = "expenses.xlsx"
 
 st.title("Roommate Expense Tracker")
 
+# Input fields
 item = st.text_input("Item")
 amount = st.number_input("Amount", min_value=0.0)
-paid_by = st.selectbox("Paid By", ["You", "Roommate"])
+
+# Only Viney and Anmol
+paid_by = st.selectbox("Paid By", ["Viney", "Anmol"])
 
 if st.button("Add Expense"):
     today = datetime.today().strftime("%Y-%m-%d")
@@ -17,7 +20,7 @@ if st.button("Add Expense"):
 
     if os.path.exists(FILE):
         df = pd.read_excel(FILE)
-        df = df.append(new_row, ignore_index=True)
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     else:
         df = pd.DataFrame([new_row])
 
@@ -27,5 +30,10 @@ if st.button("Add Expense"):
 # Show table
 if os.path.exists(FILE):
     st.subheader("All Expenses")
-    st.dataframe(pd.read_excel(FILE))
+    df = pd.read_excel(FILE)
+    st.dataframe(df)
 
+    # Summary totals
+    st.subheader("Summary")
+    summary = df.groupby("Paid By")["Amount"].sum()
+    st.write(summary)
